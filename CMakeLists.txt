@@ -123,15 +123,6 @@ install(DIRECTORY ${GENERATED_HEADERS_DIR}
     FILES_MATCHING PATTERN "*.hh"
 )
 
-# UrQMD opens tables.dat and eosfiles/... relative to the process working directory.
-# Installed layout: ${prefix}/share/COLA_UrQMD/{tables.dat,eosfiles/}
-install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/tables.dat
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/${COLA_MODULE_NAME}
-)
-install(DIRECTORY ${URQMD_SOURCE_DIR}/eosfiles
-    DESTINATION ${CMAKE_INSTALL_DATADIR}/${COLA_MODULE_NAME}
-)
-
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${COLA_MODULE_NAME}Config.cmake"
               "${CMAKE_CURRENT_BINARY_DIR}/${COLA_MODULE_NAME}ConfigVersion.cmake"
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
