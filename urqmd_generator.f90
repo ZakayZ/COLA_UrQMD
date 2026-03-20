@@ -175,9 +175,6 @@ contains
       return
     end if
     call urqmd_cola_set_env('URQMD_TAB', trim(tables_path))
-    if (len_trim(self%tables_file) > 0) then
-      call urqmd_cola_set_env('URQMD_TAB', trim(self%tables_file))
-    end if
     call urqmd_cola_set_env('ftn09', trim(self%input_file))
 
     call urqmd_cola_uinit()

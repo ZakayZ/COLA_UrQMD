@@ -11,6 +11,35 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 set(URQMD_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/urqmd-4.0)
 
+option(COLA_URQMD_EOSFILES_USE_SOURCE
+  "Point eosfiles symlink at urqmd-4.0/eosfiles (development). OFF uses CMAKE_INSTALL_FULL_DATADIR after install."
+  ON)
+option(COLA_URQMD_EOSFILES_AUTO_SYMLINK
+  "In urqmd_cola_uinit, ln -sf eosfiles into cwd when missing (Unix)."
+  ON)
+
+if(COLA_URQMD_EOSFILES_USE_SOURCE)
+  set(_COLA_EOSFILES_ABS "${URQMD_SOURCE_DIR}/eosfiles")
+else()
+  set(_COLA_EOSFILES_ABS "${CMAKE_INSTALL_FULL_DATADIR}/${COLA_MODULE_NAME}/eosfiles")
+endif()
+file(TO_CMAKE_PATH "${_COLA_EOSFILES_ABS}" COLA_EOSFILES_INSTALL_DIR)
+string(REPLACE "'" "''" COLA_EOSFILES_INSTALL_DIR "${COLA_EOSFILES_INSTALL_DIR}")
+
+if(COLA_URQMD_EOSFILES_AUTO_SYMLINK AND UNIX)
+  set(COLA_EOSFILES_AUTO_SYMLINK_LOGICAL ".true.")
+else()
+  set(COLA_EOSFILES_AUTO_SYMLINK_LOGICAL ".false.")
+endif()
+
+set(COLA_UrQMD_DATA_DIR ${CMAKE_INSTALL_DATADIR}/${COLA_MODULE_NAME})
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/eosfiles_path.inc.in
+  ${CMAKE_CURRENT_BINARY_DIR}/eosfiles_path.inc
+  @ONLY
+)
+
 set(URQMD_F_SOURCES
   ${URQMD_SOURCE_DIR}/1fluid.f
   ${URQMD_SOURCE_DIR}/addpart.f
@@ -61,6 +90,7 @@ add_cola_fortran_library(
   SOURCES
     urqmd_generator.f90
     urqmd_ref.f
+    eosfiles.f90
     ${URQMD_F_SOURCES}
 )
 
@@ -73,6 +103,7 @@ target_compile_options(${COLA_MODULE_NAME} PRIVATE -fPIC)
 
 target_include_directories(${COLA_MODULE_NAME} PRIVATE
     $<$<COMPILE_LANGUAGE:Fortran>:${URQMD_SOURCE_DIR}>
+    $<$<COMPILE_LANGUAGE:Fortran>:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
 target_include_directories(${COLA_MODULE_NAME} PUBLIC
@@ -103,6 +134,7 @@ configure_package_config_file(
     ${PROJECT_SOURCE_DIR}/data/${COLA_MODULE_NAME}Config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/${COLA_MODULE_NAME}Config.cmake
     INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
+    PATH_VARS COLA_UrQMD_DATA_DIR
 )
 
 write_basic_package_version_file(
@@ -121,6 +153,10 @@ install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/modules/
 install(DIRECTORY ${GENERATED_HEADERS_DIR}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}
     FILES_MATCHING PATTERN "*.hh"
+)
+
+install(DIRECTORY ${URQMD_SOURCE_DIR}/eosfiles
+    DESTINATION ${CMAKE_INSTALL_DATADIR}/${COLA_MODULE_NAME}
 )
 
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${COLA_MODULE_NAME}Config.cmake"

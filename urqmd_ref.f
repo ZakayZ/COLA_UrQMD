@@ -4,6 +4,7 @@
       subroutine urqmd_cola_uinit
       implicit none
 
+      call cola_ensure_eosfiles_link
       call uinit(0)
       return
       end
@@ -77,6 +78,7 @@
          close (unit=75, status='delete')
       endif
 
+      call cola_ensure_eosfiles_link
       call uinit(0)
 
       open (unit=75, iostat=ios, file=tname, form='unformatted', status='old')
