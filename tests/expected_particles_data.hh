@@ -1,14 +1,24 @@
 #pragma once
+#include <COLA/EventData.hh>
 #include <cstddef>
 
 struct ExpectedParticle {
+  cola::LorentzVector GetPosition() const {
+    return {t, x, y, z};
+  }
+
+  cola::LorentzVector GetMomentum() const {
+    return {e, px, py, pz};
+  }
+
   double t, x, y, z, e, px, py, pz;
   int pdg;
   int pclass;
 };
 
-inline constexpr std::size_t kExpectedParticleCount = 1576;
-inline constexpr ExpectedParticle kExpectedParticles[] = {
+constexpr std::size_t ExpectedParticleCount = 1576;
+// values are in GeV, not MeV from COLA.
+constexpr ExpectedParticle ExpectedParticles[] = {
   { 2.00000000e+02, 8.02830790e+00, 4.97623455e-01, 1.97668688e+02, 7.84560112e+00, 3.89779750e-02, 2.03808217e-01, 7.79085659e+00, 2212, 0 },
   { 2.00000000e+02, -1.04097182e+02, 3.99607993e+01, -5.11578361e+01, 1.52900383e+00, -8.27052511e-01, 2.87650879e-01, -3.87594837e-01, 3112, 0 },
   { 2.00000000e+02, -5.42884107e+00, -2.93797786e+01, 9.92974925e+01, 1.40456028e+00, -3.28025427e-02, -2.28482177e-01, 7.06148287e-01, 3212, 0 },

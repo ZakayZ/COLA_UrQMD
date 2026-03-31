@@ -3,9 +3,13 @@
 ! ---------------------------------------------------------------------------
       subroutine urqmd_cola_uinit
       implicit none
+      logical opened9
 
       call cola_ensure_eosfiles_link
       call uinit(0)
+
+      inquire(unit=9, opened=opened9)
+      if (opened9) close(9)
       return
       end
 
@@ -16,34 +20,47 @@
       real*8, intent(out) :: pza, pzb
       type(Particle) :: p
       type(LorentzVector) :: mom, pos
-      integer i, pdg, pdgid
-      include 'inputs.f'
+      integer i, pdg, nap, nat, npproj
+      integer, external :: pdgid
+      include 'coms.f'
 
       pza = 0.d0
       pzb = 0.d0
-      do i = 1, PT_AA(1)
-         pdg = pdgid(PT_ityp(i,1), PT_iso3(i,1))
+      nap = iabs(Ap)
+      nat = iabs(At)
+      npproj = npart - nat
+      if (npproj .lt. 0) npproj = 0
+      if (npproj .gt. npart) npproj = npart
+
+      do i = 1, npproj
+         pdg = pdgid(ityp(i), iso3(i))
          p = Particle()
          call p%set_pdgCode(pdg)
          call p%set_pClass(ParticleClass_SPECTATOR_A)
-         mom = LorentzVector(PT_p0(i,1), PT_px(i,1), PT_py(i,1), PT_pz(i,1))
+         mom = LorentzVector(1000.d0 * p0(i),
+     &        1000.d0 * (px(i) + ffermpx(i)),
+     &        1000.d0 * (py(i) + ffermpy(i)),
+     &        1000.d0 * (pz(i) + ffermpz(i)))
          call p%set_momentum(mom)
-         pos = LorentzVector(PT_r0(i,1), PT_rx(i,1), PT_ry(i,1), PT_rz(i,1))
+         pos = LorentzVector(r0(i), rx(i), ry(i), rz(i))
          call p%set_position(pos)
          call ini_parts%push_back(p)
-         pza = pza + PT_pz(i,1)
+         pza = pza + 1000.d0 * (pz(i) + ffermpz(i))
       enddo
-      do i = 1, PT_AA(2)
-         pdg = pdgid(PT_ityp(i,2), PT_iso3(i,2))
+      do i = npproj + 1, npart
+         pdg = pdgid(ityp(i), iso3(i))
          p = Particle()
          call p%set_pdgCode(pdg)
          call p%set_pClass(ParticleClass_SPECTATOR_B)
-         mom = LorentzVector(PT_p0(i,2), PT_px(i,2), PT_py(i,2), PT_pz(i,2))
+         mom = LorentzVector(1000.d0 * p0(i),
+     &        1000.d0 * (px(i) + ffermpx(i)),
+     &        1000.d0 * (py(i) + ffermpy(i)),
+     &        1000.d0 * (pz(i) + ffermpz(i)))
          call p%set_momentum(mom)
-         pos = LorentzVector(PT_r0(i,2), PT_rx(i,2), PT_ry(i,2), PT_rz(i,2))
+         pos = LorentzVector(r0(i), rx(i), ry(i), rz(i))
          call p%set_position(pos)
          call ini_parts%push_back(p)
-         pzb = pzb + PT_pz(i,2)
+         pzb = pzb + 1000.d0 * (pz(i) + ffermpz(i))
       enddo
       return
       end
@@ -68,6 +85,7 @@
       logical ok
       integer ios
       character*77 tname
+      logical opened9
 
       tname = tabpath
       if (tname(1:4).eq.'    ') tname = 'tables.dat'
@@ -80,6 +98,8 @@
 
       call cola_ensure_eosfiles_link
       call uinit(0)
+      inquire(unit=9, opened=opened9)
+      if (opened9) close(9)
 
       open (unit=75, iostat=ios, file=tname, form='unformatted', status='old')
       if (ios.eq.0) then

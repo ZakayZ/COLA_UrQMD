@@ -230,5 +230,16 @@ contains
 
   subroutine generator_final(self)
     type(URQMDGenerator), intent(inout) :: self
+    integer :: u, ios
+    logical :: fexists
+
+    if (len_trim(self%generated_config_file) == 0) return
+
+    inquire(file=trim(self%generated_config_file), exist=fexists)
+    if (.not. fexists) return
+
+    open(newunit=u, file=trim(self%generated_config_file), status='old', iostat=ios)
+    if (ios /= 0) return
+    close(u, status='delete', iostat=ios)
   end subroutine generator_final
 end module cola_fortran_generator_impl
