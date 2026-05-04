@@ -1,4 +1,4 @@
-"""Spatial/momentum-cut baseline clustering and partition energy for PPO training."""
+"""Spatial/momentum-cut baseline clustering and partition energy."""
 
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ def baseline_clusters_numpy(
 
     ``pos`` is ``(N, 3)`` ``(x,y,z)`` fm or ``(N, 4)`` ``(t, x, y, z)`` (only spatial columns are used).
     ``mom`` is ``(N, 4)`` with ``(E, px, py, pz)`` in **MeV/c**;
-    the cut uses ``k = p_spatial / ħc`` (fm⁻¹), matching the kNN feature space in ``ppo_train``.
+    the cut uses ``k = p_spatial / ħc`` (fm⁻¹), matching the kNN feature space in ``models.env``.
     ``q_cut_momentum`` is the same **MeV/c** scale as ``|Δp|`` (internally converted to ``k_cut``).
     """
     pos = np.asarray(pos, dtype=np.float64)
@@ -75,7 +75,7 @@ def baseline_clusters_numpy(
 class EventBaseline:
     """Per-event baseline: node-wise cluster ids, partition loss, and cluster lists.
 
-    ``loss`` is the partition energy in **MeV** (same scale as ``partition_loss_numpy`` × 1000).
+    ``loss`` is the partition energy in **MeV** (same scale as :func:`~cluster_energy.partition_loss_numpy`).
     """
 
     node_labels: np.ndarray
@@ -97,7 +97,7 @@ def compute_event_baseline(
     node_lab = np.empty((n_ev,), dtype=np.int32)
     for ci, c in enumerate(part_b):
         node_lab[np.asarray(c, dtype=np.int64)] = int(ci)
-    loss = float(partition_loss_numpy(pos, mom, is_proton, part_b)) * 1000.0
+    loss = float(partition_loss_numpy(pos, mom, is_proton, part_b))
     return EventBaseline(node_labels=node_lab, loss=loss, partition=part_b)
 
 

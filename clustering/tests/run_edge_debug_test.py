@@ -3,27 +3,33 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
+
+_CLUSTERING_ROOT = Path(__file__).resolve().parent.parent
+_TESTS_DIR = Path(__file__).resolve().parent
+for _root in (_CLUSTERING_ROOT, _TESTS_DIR):
+    _sr = str(_root)
+    if _sr not in sys.path:
+        sys.path.insert(0, _sr)
 
 import numpy as np
 import torch.optim as optim
 from torch.optim.lr_scheduler import LinearLR
 
-from ppo_train import (
+from models import (
     AffinityGraphConfig,
+    AffinityGraphEnv,
     GAT_NODE_IN_DIM,
     GATAffinityPolicy,
-    baseline_edge_targets,
     load_valid_events_from_pkl,
-    make_event_sampler,
-    train_reinforce,
 )
-from ppo_train import AffinityGraphEnv
+from training.utils import baseline_edge_targets, make_event_sampler
+from training.reinforce import train_reinforce
 
 
 def parse_args() -> argparse.Namespace:
-    here = Path(__file__).resolve().parent
-    default_dataset = here / "datasets" / "urqmd_nucleons_1k" / "dataset.pkl"
+    default_dataset = _CLUSTERING_ROOT / "datasets" / "urqmd_nucleons_1k" / "dataset.pkl"
     p = argparse.ArgumentParser(description="Run a reproducible REINFORCE edge-debug pass.")
     p.add_argument("--dataset", type=Path, default=default_dataset, help="Path to dataset.pkl")
     p.add_argument("--seed", type=int, default=1234, help="RNG seed")
