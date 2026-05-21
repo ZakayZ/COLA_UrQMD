@@ -35,8 +35,8 @@
       do i = 1, npproj
          pdg = pdgid(ityp(i), iso3(i))
          p = Particle()
-         call p%set_pdgCode(pdg)
-         call p%set_pClass(ParticleClass_SPECTATOR_A)
+         call p%set_pdg_code(pdg)
+         call p%set_p_class(ParticleClass_kSpectatorA)
          mom = LorentzVector(1000.d0 * p0(i),
      &        1000.d0 * (px(i) + ffermpx(i)),
      &        1000.d0 * (py(i) + ffermpy(i)),
@@ -50,8 +50,8 @@
       do i = npproj + 1, npart
          pdg = pdgid(ityp(i), iso3(i))
          p = Particle()
-         call p%set_pdgCode(pdg)
-         call p%set_pClass(ParticleClass_SPECTATOR_B)
+         call p%set_pdg_code(pdg)
+         call p%set_p_class(ParticleClass_kSpectatorB)
          mom = LorentzVector(1000.d0 * p0(i),
      &        1000.d0 * (px(i) + ffermpx(i)),
      &        1000.d0 * (py(i) + ffermpy(i)),
@@ -220,34 +220,34 @@
 
       ! coalesence
       if (lstcollv.lt.-1 .and. ncollv.eq.0) then
-         urqmd_cola_classify_pclass = ParticleClass_PRODUCED
+         urqmd_cola_classify_pclass = ParticleClass_kProduced
          return
       endif
 
       ! out of bounds
       if (uidv.le.0 .or. uidv.gt.nmax) then
-         urqmd_cola_classify_pclass = ParticleClass_PRODUCED
+         urqmd_cola_classify_pclass = ParticleClass_kProduced
          return
       endif
 
       ! marked produced
       if (uid_produced(uidv).eq.1) then
-         urqmd_cola_classify_pclass = ParticleClass_PRODUCED
+         urqmd_cola_classify_pclass = ParticleClass_kProduced
          return
       endif
 
       ! wasn't initiated for some reason
       if (uid_initial(uidv).eq.0) then
-         urqmd_cola_classify_pclass = ParticleClass_PRODUCED
+         urqmd_cola_classify_pclass = ParticleClass_kProduced
          return
       endif
 
       ! spectator (no interactions)
       if (uid_nprocs(uidv).eq.0) then
          if (uid_initial(uidv).eq.uid_nucleus_a) then
-            urqmd_cola_classify_pclass = ParticleClass_SPECTATOR_A
+            urqmd_cola_classify_pclass = ParticleClass_kSpectatorA
          else
-            urqmd_cola_classify_pclass = ParticleClass_SPECTATOR_B
+            urqmd_cola_classify_pclass = ParticleClass_kSpectatorB
          endif
          return
       endif
@@ -260,15 +260,15 @@
 
       if (all_elastic) then
          if (uid_initial(uidv).eq.uid_nucleus_a) then
-            urqmd_cola_classify_pclass = ParticleClass_ELASTIC_A
+            urqmd_cola_classify_pclass = ParticleClass_kElasticA
          else
-            urqmd_cola_classify_pclass = ParticleClass_ELASTIC_B
+            urqmd_cola_classify_pclass = ParticleClass_kElasticB
          endif
       else
          if (uid_initial(uidv).eq.uid_nucleus_a) then
-            urqmd_cola_classify_pclass = ParticleClass_NONELASTIC_A
+            urqmd_cola_classify_pclass = ParticleClass_kNonelasticA
          else
-            urqmd_cola_classify_pclass = ParticleClass_NONELASTIC_B
+            urqmd_cola_classify_pclass = ParticleClass_kNonelasticB
          endif
       endif
       return
@@ -304,8 +304,8 @@
          pzv = 1000 * (pz(i) + ffermpz(i)) ! to MeV
          pclass = urqmd_cola_classify_pclass(uid(i), pzv, ncoll(i), lstcoll(i))
          p = Particle()
-         call p%set_pdgCode(pdg)
-         call p%set_pClass(pclass)
+         call p%set_pdg_code(pdg)
+         call p%set_p_class(pclass)
          mom = LorentzVector(p0v, pxv, pyv, pzv)
          call p%set_momentum(mom)
          pos = LorentzVector(r0(i), rx(i), ry(i), rz(i))

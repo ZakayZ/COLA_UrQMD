@@ -17,3 +17,5 @@ __pycache__
 /test/build/
 /test/cmake-build-debug/
 tables.dat
+.cache/
+.pytest_cache/

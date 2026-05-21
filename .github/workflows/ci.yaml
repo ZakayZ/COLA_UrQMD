@@ -1,0 +1,111 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+    branches: [ main, master ]
+  pull_request_target:
+    types: [ opened, synchronize, reopened ]
+    branches: [ main, master ]
+
+jobs:
+  ci:
+    name: CI (${{ matrix.os }} - ${{ matrix.compiler }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            compiler: g++
+            cc: gcc
+            cxx: g++
+          - os: macos-latest
+            compiler: clang
+            cc: clang
+            cxx: clang++
+
+    steps:
+      - name: Checkout COLA_UrQMD
+        uses: actions/checkout@v6
+        with:
+          path: COLA_UrQMD
+
+      - name: Checkout COLA_Fortran
+        uses: actions/checkout@v6
+        with:
+          repository: ZakayZ/COLA_Fortran
+          ref: main
+          path: COLA_Fortran
+
+      - name: Checkout COLA
+        uses: actions/checkout@v6
+        with:
+          repository: ZakayZ/COLA
+          ref: tidy
+          path: cola
+
+      - name: Install dependencies (Ubuntu)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake g++ gfortran \
+            libgtest-dev clang-format-19 clang-tidy
+          pip install cmake-format
+
+      - name: Install dependencies (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          brew install cmake googletest
+
+      - name: Setup Fortran
+        if: matrix.os == 'macos-latest'
+        uses: fortran-lang/setup-fortran@v1
+
+      - name: Build and install COLA
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: |
+          cmake -S cola -B cola/build \
+            -DCMAKE_INSTALL_PREFIX=cola/install \
+            -DBUILD_TESTING=OFF \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build cola/build --parallel
+          cmake --install cola/build
+
+      - name: Build and install COLA_Fortran
+        working-directory: ${{ github.workspace }}/COLA_Fortran
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: |
+          export CMAKE_PREFIX_PATH="${GITHUB_WORKSPACE}/cola/install:${CMAKE_PREFIX_PATH}"
+          cmake --preset release
+          cmake --build --preset release --parallel
+          cmake --install build/release
+
+      - name: Build and test (release)
+        working-directory: ${{ github.workspace }}/COLA_UrQMD
+        env:
+          CC: ${{ matrix.cc }}
+          CXX: ${{ matrix.cxx }}
+        run: |
+          export CMAKE_PREFIX_PATH="${GITHUB_WORKSPACE}/cola/install:${CMAKE_PREFIX_PATH}"
+          cmake --workflow release-test
+
+      - name: Clang-tidy and unit tests (debug + tidy)
+        working-directory: ${{ github.workspace }}/COLA_UrQMD
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          export CMAKE_PREFIX_PATH="${GITHUB_WORKSPACE}/cola/install:${CMAKE_PREFIX_PATH}"
+          cmake --workflow test
+
+      - name: Check formatting
+        working-directory: ${{ github.workspace }}/COLA_UrQMD
+        if: always() && matrix.os == 'ubuntu-latest'
+        run: |
+          export CMAKE_PREFIX_PATH="${GITHUB_WORKSPACE}/cola/install:${CMAKE_PREFIX_PATH}"
+          cmake --workflow check-format
