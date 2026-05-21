@@ -11,7 +11,6 @@ find_package(COLA_Fortran REQUIRED)
 
 set(CMAKE_INSTALL_PREFIX ${COLA_DIR})
 set(COLA_MODULE_NAME COLA_UrQMD)
-set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 set(URQMD_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/urqmd-4.0)
 
@@ -103,6 +102,14 @@ target_compile_options(${COLA_MODULE_NAME} PRIVATE -fPIC)
 target_include_directories(
     ${COLA_MODULE_NAME} PRIVATE $<$<COMPILE_LANGUAGE:Fortran>:${URQMD_SOURCE_DIR}>
                                 $<$<COMPILE_LANGUAGE:Fortran>:${CMAKE_CURRENT_BINARY_DIR}>
+)
+
+set_target_properties(
+    ${COLA_MODULE_NAME}
+    PROPERTIES VERSION "${PROJECT_VERSION}"
+               SOVERSION "${PROJECT_VERSION_MAJOR}"
+               BUILD_WITH_INSTALL_RPATH TRUE
+               INSTALL_RPATH_USE_LINK_PATH TRUE
 )
 
 target_include_directories(

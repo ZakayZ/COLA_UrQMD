@@ -20,7 +20,7 @@ namespace {
   constexpr int kCollisionsPerEnergy = 4;
 
   double Tolerance(double a, double b, double rel_tolerance = kRelTol) {
-    return rel_tolerance * std::max(1.0, std::max(std::abs(a), std::abs(b)));
+    return rel_tolerance * std::max({1.0, std::abs(a), std::abs(b)});
   }
 
   std::unique_ptr<cola::VGenerator> MakeUrQMDGenerator(double elb_a_gev, int random_seed,
