@@ -185,6 +185,20 @@
             ]
         },
         {
+            "name": "check-format",
+            "displayName": "Check All Linters Workflow",
+            "steps": [
+                {
+                    "type": "configure",
+                    "name": "tidy"
+                },
+                {
+                    "type": "build",
+                    "name": "check-format"
+                }
+            ]
+        },
+        {
             "name": "fix-format",
             "displayName": "Fix All Linters Workflow",
             "steps": [
