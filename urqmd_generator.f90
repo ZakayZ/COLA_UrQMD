@@ -182,6 +182,7 @@ contains
   end subroutine generator_init
 
   function generator_run(self, err) result(ed)
+    use last_event_storage
     class(URQMDGenerator), intent(in) :: self
     character(len=:), allocatable, intent(out) :: err
     type(EventData) :: ed
@@ -205,8 +206,8 @@ contains
     ini = ed%get_ini_state()
     call ini%set_pdg_code_a(pdga)
     call ini%set_pdg_code_b(pdgb)
-    call ini%set_p_za(pza)
-    call ini%set_p_zb(pzb)
+    call ini%set_pz_a(pza)
+    call ini%set_pz_b(pzb)
     call ini%set_energy(eout)
     call ini%set_sect_nn(real(snnout, kind(0.0)))
     call ini%set_b(real(bimp_val, kind(0.0)))
@@ -226,6 +227,7 @@ contains
     call ed%set_ini_state(ini)
     call ed%set_particles(parts)
 
+    call set_evolution_essentials
   end function generator_run
 
   subroutine generator_final(self)

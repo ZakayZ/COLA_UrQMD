@@ -88,6 +88,7 @@ c  first the pauliblocking
              write(6,*)'***(E) negative transverse distance !!',r2
              write(6,*)r0(j),rx(j),ry(j),rz(j),p0(j),px(j),py(j),pz(j)
              write(6,*)r0(i),rx(i),ry(i),rz(i),p0(i),px(i),py(i),pz(i)
+
              r2=1000.d0
           endif
           pr2 = (px(i)-px(j))**2+(py(i)-py(j))**2+(pz(i)-pz(j))**2

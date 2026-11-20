@@ -46,6 +46,7 @@
          call p%set_position(pos)
          call ini_parts%push_back(p)
          pza = pza + 1000.d0 * (pz(i) + ffermpz(i))
+
       enddo
       do i = npproj + 1, npart
          pdg = pdgid(ityp(i), iso3(i))
@@ -61,6 +62,8 @@
          call p%set_position(pos)
          call ini_parts%push_back(p)
          pzb = pzb + 1000.d0 * (pz(i) + ffermpz(i))
+
+         
       enddo
       return
       end
@@ -298,10 +301,10 @@
 
       do i = 1, npart
          pdg = pdgid(ityp(i), iso3(i))
-         p0v = 1000 * p0(i) ! to MeV
-         pxv = 1000 * (px(i) + ffermpx(i)) ! to MeV
-         pyv = 1000 * (py(i) + ffermpy(i)) ! to MeV
-         pzv = 1000 * (pz(i) + ffermpz(i)) ! to MeV
+         p0v = 1000.0 * p0(i) ! to MeV
+         pxv = 1000.0 * (px(i) + ffermpx(i)) ! to MeV
+         pyv = 1000.0 * (py(i) + ffermpy(i)) ! to MeV
+         pzv = 1000.0 * (pz(i) + ffermpz(i)) ! to MeV
          pclass = urqmd_cola_classify_pclass(uid(i), pzv, ncoll(i), lstcoll(i))
          p = Particle()
          call p%set_pdg_code(pdg)
@@ -311,6 +314,7 @@
          pos = LorentzVector(r0(i), rx(i), ry(i), rz(i))
          call p%set_position(pos)
          call parts%push_back(p)
+
       enddo
       return
       end
