@@ -6,9 +6,6 @@ on:
   pull_request:
     types: [ opened, synchronize, reopened ]
     branches: [ main, master ]
-  pull_request_target:
-    types: [ opened, synchronize, reopened ]
-    branches: [ main, master ]
 
 jobs:
   ci:
@@ -18,7 +15,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             compiler: g++
             cc: gcc
             cxx: g++
@@ -48,12 +45,13 @@ jobs:
           path: cola
 
       - name: Install dependencies (Ubuntu)
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-24.04'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential cmake g++ gfortran \
-            libgtest-dev clang-format-19 clang-tidy
+            libgtest-dev clang-format-19 clang-tidy-18
           pip install cmake-format
+          echo "/usr/lib/llvm-18/bin" >> "$GITHUB_PATH"
 
       - name: Install dependencies (macOS)
         if: matrix.os == 'macos-latest'
@@ -98,14 +96,14 @@ jobs:
 
       - name: Clang-tidy and unit tests (debug + tidy)
         working-directory: ${{ github.workspace }}/COLA_UrQMD
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-24.04'
         run: |
           export CMAKE_PREFIX_PATH="${GITHUB_WORKSPACE}/cola/install:${CMAKE_PREFIX_PATH}"
           cmake --workflow test
 
       - name: Check formatting
         working-directory: ${{ github.workspace }}/COLA_UrQMD
-        if: always() && matrix.os == 'ubuntu-latest'
+        if: always() && matrix.os == 'ubuntu-24.04'
         run: |
           export CMAKE_PREFIX_PATH="${GITHUB_WORKSPACE}/cola/install:${CMAKE_PREFIX_PATH}"
           cmake --workflow check-format
