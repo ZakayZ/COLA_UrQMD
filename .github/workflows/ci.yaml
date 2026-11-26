@@ -34,15 +34,14 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: ZakayZ/COLA_Fortran
-          # Keep the generated Fortran API compatible with the COLA revision below.
-          ref: 852688e7200ef1510c64228e77ae83043f5f4c78
+          ref: main
           path: COLA_Fortran
 
       - name: Checkout COLA
         uses: actions/checkout@v6
         with:
           repository: ZakayZ/COLA
-          ref: 7e61da42e831b29baaaf9efea98f0b3d416e35da
+          ref: tidy
           path: cola
 
       - name: Install dependencies (Ubuntu)
