@@ -182,6 +182,7 @@ contains
   end subroutine generator_init
 
   function generator_run(self, err) result(ed)
+    use last_event_storage
     class(URQMDGenerator), intent(in) :: self
     character(len=:), allocatable, intent(out) :: err
     type(EventData) :: ed
@@ -226,6 +227,7 @@ contains
     call ed%set_ini_state(ini)
     call ed%set_particles(parts)
 
+    call set_evolution_essentials
   end function generator_run
 
   subroutine generator_final(self)
